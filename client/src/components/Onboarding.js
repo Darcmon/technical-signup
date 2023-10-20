@@ -48,6 +48,8 @@ const Onboarding = () => {
     isFetching: true,
   });
   const [onboardingData, setOnboardingData] = useState();
+  const [formStep, setFormStep] = useState(0);
+  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     const fetchOnboardingFormData = async () => {
@@ -64,6 +66,16 @@ const Onboarding = () => {
 
     fetchOnboardingFormData();
   }, []);
+
+  useEffect(() => {
+    // Check if all required fields are filled
+    const requiredFields = ["firstName", "country"]; // Update with your required fields
+    const isValid = requiredFields.every(
+      (field) => onboardingData && onboardingData[field]
+    );
+
+    setIsFormValid(isValid);
+  }, [onboardingData]);
 
   const onInputChange = (event, type = "text") => {
     setOnboardingData((prevData) => {
@@ -82,19 +94,137 @@ const Onboarding = () => {
     });
   };
 
-  const renderButton = (text, onClick) => {
-    return (
-      <Button
-        className={classes.button}
-        type="submit"
-        variant="contained"
-        size="large"
-        onClick={onClick}
-        disabled={false}
-      >
-        {text}
-      </Button>
-    );
+  const formDisplay = () => {
+    if (formStep === 0) {
+      return (
+        <>
+          <FormControl fullWidth className={classes.formControl}>
+            <TextInput
+              label={"First Name"}
+              name={"firstName"}
+              required={true}
+              onboardingData={onboardingData}
+              onChange={onInputChange}
+            />
+          </FormControl>
+
+          <FormControl fullWidth className={classes.formControl}>
+            <TextInput
+              label={"Last Name"}
+              name={"lastName"}
+              required={false}
+              onboardingData={onboardingData}
+              onChange={onInputChange}
+            />
+          </FormControl>
+
+          <FormControl fullWidth className={classes.formControl}>
+            <TextInput
+              label={"Country"}
+              name={"country"}
+              required={true}
+              onboardingData={onboardingData}
+              onChange={onInputChange}
+            />
+          </FormControl>
+
+          <FormControl fullWidth className={classes.formControl}>
+            <TextInput
+              label={"Bio"}
+              name={"bio"}
+              required={false}
+              onboardingData={onboardingData}
+              onChange={onInputChange}
+              textarea={true}
+            />
+          </FormControl>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <FormControl fullWidth className={classes.formControl}>
+            <Toggle
+              label={
+                "I would like to receive email notifications for new messages when I'm logged out"
+              }
+              name={"receiveNotifications"}
+              onChange={onInputChange}
+              onboardingData={onboardingData}
+            />
+          </FormControl>
+          <FormControl fullWidth className={classes.formControl}>
+            <Toggle
+              label={"I would like to receive updates"}
+              name={"receiveUpdates"}
+              onChange={onInputChange}
+              onboardingData={onboardingData}
+            />
+          </FormControl>
+        </>
+      );
+    }
+  };
+
+  const renderButton = (text) => {
+    if (text === "Back") {
+      console.log(formStep);
+      return (
+        <Button
+          className={classes.button}
+          type="submit"
+          variant="contained"
+          size="large"
+          onClick={() => {
+            setFormStep((currentStep) => currentStep - 1);
+          }}
+          style={{ opacity: formStep === 0 ? "0" : "100" }} // Visibility of button changes based on formStep
+        >
+          {text}
+        </Button>
+      );
+    } else if (text === "Next") {
+      console.log(formStep);
+
+      return (
+        <Button
+          className={classes.button}
+          type="submit"
+          variant="contained"
+          size="large"
+          onClick={() => {
+            if (isFormValid) {
+              setFormStep((currentStep) => currentStep + 1);
+            }
+          }}
+          disabled={!isFormValid}
+          style={{ opacity: formStep === 1 ? "0" : "100" }} // Visibility of button changes based on formStep
+        >
+          {text}
+        </Button>
+      );
+    } else {
+      console.log(formStep);
+
+      return (
+        <Button
+          className={classes.button}
+          type="submit"
+          variant="contained"
+          size="large"
+          onClick={() => {
+            if (isFormValid) {
+              setFormStep(0);
+              saveOnboarding();
+            }
+          }}
+          disabled={!isFormValid}
+          style={{ opacity: formStep === 0 ? "0" : "100" }} // Visibility of button changes based on formStep
+        >
+          {text}
+        </Button>
+      );
+    }
   };
 
   if (onboardingForm?.isFetching) {
@@ -104,65 +234,7 @@ const Onboarding = () => {
   return (
     <Grid container justifyContent="center">
       <Paper className={classes.container}>
-        <FormControl fullWidth className={classes.formControl}>
-          <TextInput
-            label={"First Name"}
-            name={"firstName"}
-            required={true}
-            onboardingData={onboardingData}
-            onChange={onInputChange}
-          />
-        </FormControl>
-
-        <FormControl fullWidth className={classes.formControl}>
-          <TextInput
-            label={"Last Name"}
-            name={"lastName"}
-            required={true}
-            onboardingData={onboardingData}
-            onChange={onInputChange}
-          />
-        </FormControl>
-
-        <FormControl fullWidth className={classes.formControl}>
-          <TextInput
-            label={"Country"}
-            name={"country"}
-            required={true}
-            onboardingData={onboardingData}
-            onChange={onInputChange}
-          />
-        </FormControl>
-
-        <FormControl fullWidth className={classes.formControl}>
-          <TextInput
-            label={"Bio"}
-            name={"bio"}
-            required={true}
-            onboardingData={onboardingData}
-            onChange={onInputChange}
-            textarea={true}
-          />
-        </FormControl>
-
-        <FormControl fullWidth className={classes.formControl}>
-          <Toggle
-            label={
-              "I would like to receive email notifications for new messages when I'm logged out"
-            }
-            name={"receiveNotifications"}
-            onChange={onInputChange}
-            onboardingData={onboardingData}
-          />
-        </FormControl>
-        <FormControl fullWidth className={classes.formControl}>
-          <Toggle
-            label={"I would like to receive updates"}
-            name={"receiveUpdates"}
-            onChange={onInputChange}
-            onboardingData={onboardingData}
-          />
-        </FormControl>
+        {formDisplay()}
 
         <FormControl fullWidth className={classes.formControl}>
           <Typography className={classes.error}>
@@ -172,7 +244,7 @@ const Onboarding = () => {
           <Grid justifyContent="space-between" container>
             <Grid item>
               {renderButton("Back")}
-              {renderButton("Finish", saveOnboarding)}
+              {renderButton("Finish")}
               {renderButton("Next")}
             </Grid>
           </Grid>
