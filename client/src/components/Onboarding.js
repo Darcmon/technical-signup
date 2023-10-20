@@ -40,14 +40,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Onboarding = () => {
+const Onboarding = (props) => {
   const classes = useStyles();
   const history = useHistory();
 
   const [onboardingForm, setOnboardingForm] = useState({
     isFetching: true,
   });
-  const [onboardingData, setOnboardingData] = useState();
+  const [onboardingData, setOnboardingData] = useState(props.user);
   const [formStep, setFormStep] = useState(0);
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -63,7 +63,6 @@ const Onboarding = () => {
         setOnboardingForm((prev) => ({ ...prev, isFetching: false }));
       }
     };
-
     fetchOnboardingFormData();
   }, []);
 
@@ -77,6 +76,25 @@ const Onboarding = () => {
     setIsFormValid(isValid);
   }, [onboardingData]);
 
+  function prepareFormData(onboardingData) {
+    const step1Fields = [
+      { name: "firstName", value: onboardingData.firstName || "" },
+      { name: "lastName", value: onboardingData.lastName || "" },
+      { name: "bio", value: onboardingData.bio || "" },
+    ];
+
+    const step2Fields = [
+      { name: "country", value: onboardingData.country || "" },
+      {
+        name: "receiveNotifications",
+        value: onboardingData.receiveNotifications || false,
+      },
+      { name: "receiveUpdates", value: onboardingData.receiveUpdates || false },
+    ];
+
+    return { steps: [step1Fields, step2Fields] };
+  }
+
   const onInputChange = (event, type = "text") => {
     setOnboardingData((prevData) => {
       return {
@@ -87,7 +105,16 @@ const Onboarding = () => {
     });
   };
 
-  const saveOnboarding = () => {
+  const saveOnboarding = async () => {
+    const formData = prepareFormData(onboardingData);
+
+    try {
+      const response = await axios.post("/api/onboarding", formData);
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+
     history.push({
       pathname: "/home",
       state: { onboarding: true },
@@ -168,7 +195,6 @@ const Onboarding = () => {
 
   const renderButton = (text) => {
     if (text === "Back") {
-      console.log(formStep);
       return (
         <Button
           className={classes.button}
@@ -184,8 +210,6 @@ const Onboarding = () => {
         </Button>
       );
     } else if (text === "Next") {
-      console.log(formStep);
-
       return (
         <Button
           className={classes.button}
@@ -204,8 +228,6 @@ const Onboarding = () => {
         </Button>
       );
     } else {
-      console.log(formStep);
-
       return (
         <Button
           className={classes.button}
@@ -214,6 +236,7 @@ const Onboarding = () => {
           size="large"
           onClick={() => {
             if (isFormValid) {
+              //Now handles the saveOnboarding
               setFormStep(0);
               saveOnboarding();
             }
@@ -237,9 +260,11 @@ const Onboarding = () => {
         {formDisplay()}
 
         <FormControl fullWidth className={classes.formControl}>
-          <Typography className={classes.error}>
-            Please fill all the required fields before proceeding.
-          </Typography>
+          {formStep === 0 ? (
+            <Typography className={classes.error}>
+              Please fill all the required fields before proceeding.
+            </Typography>
+          ) : null}
 
           <Grid justifyContent="space-between" container>
             <Grid item>
