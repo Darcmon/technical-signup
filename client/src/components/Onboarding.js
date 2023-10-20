@@ -116,6 +116,26 @@ const Onboarding = () => {
 
         <FormControl fullWidth className={classes.formControl}>
           <TextInput
+            label={"Last Name"}
+            name={"lastName"}
+            required={true}
+            onboardingData={onboardingData}
+            onChange={onInputChange}
+          />
+        </FormControl>
+
+        <FormControl fullWidth className={classes.formControl}>
+          <TextInput
+            label={"Country"}
+            name={"country"}
+            required={true}
+            onboardingData={onboardingData}
+            onChange={onInputChange}
+          />
+        </FormControl>
+
+        <FormControl fullWidth className={classes.formControl}>
+          <TextInput
             label={"Bio"}
             name={"bio"}
             required={true}
@@ -125,6 +145,16 @@ const Onboarding = () => {
           />
         </FormControl>
 
+        <FormControl fullWidth className={classes.formControl}>
+          <Toggle
+            label={
+              "I would like to receive email notifications for new messages when I'm logged out"
+            }
+            name={"receiveNotifications"}
+            onChange={onInputChange}
+            onboardingData={onboardingData}
+          />
+        </FormControl>
         <FormControl fullWidth className={classes.formControl}>
           <Toggle
             label={"I would like to receive updates"}
