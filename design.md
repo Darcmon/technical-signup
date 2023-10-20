@@ -6,16 +6,16 @@
 
 ## Please format your answers sot hat they are easy to digest, and do not include any code in your pull req. This is meant to eval your written communication rather than programming skills.
 
-# assume we have access to dataset at any point in time
+# assume order of STEPS matter
 
-# assume based on current design structure there is a need for permissions (thomas, santiago, chiumbo, and hualing) have isolated creation patterns compared to ashanti, julia, and cheng
+# think about 2 dimensional hierarchy (page index and fields index)
 
 # assume we are continuing to use same sanitizing/validation for information with advised revisions
 
-# decide how to create entities around the current dataset
+# decide how to create table around the STEPS
 
-# entity1: login (username, password)
+# create table where the fields include name, label, type, required
 
-# entity2: user (username, email, photoUrl, firstname, lastname, country, bio, receivenoti, receiveupdates, completedonboarding)
+# create second table where the fields include country, receivenotifications, receiveupdates
 
 # map the information to entities
